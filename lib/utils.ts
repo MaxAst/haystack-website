@@ -46,6 +46,14 @@ export type StaticPageProps = {
 
 const slugger = new GitHubSlugger();
 
+const getBasePath = () => {
+  let basePath = process.cwd();
+  if (process.env.NODE_ENV === "production") {
+    basePath = join(process.cwd(), ".next/server/chunks");
+  }
+  return basePath;
+};
+
 export const getStaticLayoutProps = async ({
   content,
   version,
@@ -85,7 +93,7 @@ export const getStaticLayoutProps = async ({
 export const getMenu = (version?: string) => {
   const latestVersion = getLatestVersion();
   const menuPath = join(
-    process.cwd(),
+    getBasePath(),
     `docs/${version || latestVersion}/menu.json`
   );
   return JSON.parse(fs.readFileSync(menuPath, "utf8"));
@@ -94,14 +102,14 @@ export const getMenu = (version?: string) => {
 export const getBenchmarks = (type: string, name: string, version?: string) => {
   const latestVersion = getLatestVersion();
   const benchmarksPath = join(
-    process.cwd(),
+    getBasePath(),
     `benchmarks/${version || latestVersion}/${type}/${name}.json`
   );
   return JSON.parse(fs.readFileSync(benchmarksPath, "utf8"));
 };
 
 export function getDocsVersions() {
-  return fs.readdirSync(join(process.cwd(), "docs"));
+  return fs.readdirSync(join(getBasePath(), "docs"));
 }
 
 export function getVersionFromParams(params: string[]) {
@@ -115,7 +123,7 @@ export function getLatestVersion() {
 
 export function getDirectory(category: "overview" | "usage", version?: string) {
   const latestVersion = getLatestVersion();
-  return join(process.cwd(), `docs/${version || latestVersion}/${category}`);
+  return join(getBasePath(), `docs/${version || latestVersion}/${category}`);
 }
 
 export function getDirectoryBenchmarks(
@@ -124,7 +132,7 @@ export function getDirectoryBenchmarks(
 ) {
   const latestVersion = getLatestVersion();
   return join(
-    process.cwd(),
+    getBasePath(),
     `benchmarks/${version || latestVersion}/${category}`
   );
 }
